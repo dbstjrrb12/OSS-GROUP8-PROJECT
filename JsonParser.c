@@ -9,6 +9,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef enum {
+    UNDEFINED = 0,
+    OBJECT = 1,
+    ARRAY = 2,
+    STRING = 3,
+    PRIMITIVE = 4
+} type_t;
+
+typedef struct {
+    type_t type; // Token type
+    int start; // Token start position
+    int end; // Token end position
+    int size; // Number of child (nested) tokens
+} tok_t;
+
 int main(int argc, char* argv[]) {
     
     
@@ -42,11 +57,21 @@ int main(int argc, char* argv[]) {
    printf("The File name is = \"%s\" \n\n", argv[1]);
    
    while((d = fgetc(fp)) != EOF){
-	//printf("Hi");
       //buff[n] = d;
-      //n++;
-      printf("%c", d);
+      n++;
+     // printf("%c", d);
     }
-  
-    return 0;
+
+   rewind(fp);
+
+   char *buff = (char*) malloc(n*sizeof(char);
+   
+   int i=0;
+   
+   while((d = fgetc(fp)) != EOF){
+   buff[i] = d;
+   i++;
+   }
+
+   return 0;
 }
