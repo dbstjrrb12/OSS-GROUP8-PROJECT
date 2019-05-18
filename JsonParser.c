@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void Parser(int size, char * buff);
+
 typedef enum {
     UNDEFINED = 0,
     OBJECT = 1,
@@ -24,8 +26,10 @@ typedef struct {
     int size; // Number of child (nested) tokens
 } tok_t;
 
+tok_t token;
+
 int main(int argc, char* argv[]) {
-    
+
     
     // 옵션 지정하지 않았을 때 에러 출력하고 종료
     if (argc == 1) {
@@ -64,7 +68,7 @@ int main(int argc, char* argv[]) {
 
    rewind(fp);
 
-   char *buff = (char*) malloc(n*sizeof(char);
+   char *buff = (char*) malloc(n*sizeof(char));
    
    int i=0;
    
@@ -73,5 +77,73 @@ int main(int argc, char* argv[]) {
    i++;
    }
 
+  Parser(n,buff);
    return 0;
+}
+
+void Parser(int size, char *buff)
+{
+    int i = 0;
+    int j = 0;
+   
+  while(i != size){
+        //buff[n] = d;
+       // n++;
+      
+        printf("buff[%d] = %c\n", i,buff[i]);
+        i++;
+        
+    }
+    
+    i=0;
+//
+    
+  if(buff[0] != '{'){
+      printf("in if \n");
+       return;
+    }
+   i++;
+
+  //  printf("%d", size);
+    
+    while(i < size){
+       // printf("while\n");
+        
+        switch ( buff[i] ) {
+            case '"':
+               // printf("1");
+                token.start = i+1;
+                token.type = 3;
+                //printf("2");
+                j=i+1;
+                while(buff[j] != '"'){
+                    j++;
+                }
+                i = j;
+               // printf("3");
+                token.end = i;
+                token.size = token.end - token.start+1;
+              
+                
+                for(int a = token.start; a<token.end; a++)
+                {
+                    printf("%c",buff[a]);
+                    
+                }
+                printf(" : ");
+                printf("%d\n",token.type);
+                printf("token size = %d\n",token.size);
+                printf("start = %d, end =%d \n", token.start, token.end);
+                break;
+                
+            default: break;
+                
+           // case '{' :
+           
+             //   break;
+        }
+        i++;
+    }
+    
+
 }
