@@ -1,5 +1,5 @@
-json : JsonParser.c
-	gcc -o json JsonParser.c
+json : main.c
+	gcc -o json main.c
 
 clean :
 	rm -rf json
