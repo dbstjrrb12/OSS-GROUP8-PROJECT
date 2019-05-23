@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
         printf("argv[%d] = %s\n", i, argv[i]);
     
     
-    FILE * fp = fopen(argv[1],"r");
+    FILE * fp = fopen("/Users/seojunpyo/Documents/project/19OSS/OSS-GROUP8-PROJECT/OSSproj/OSSproj/test.json", "r");
     //char buff[1024];
     char d;
     int n = 0;
@@ -195,7 +195,7 @@ void Parser(int size, int startp, char *buff)
                 break;
                 
             case  '[' :
-                
+                token.size ++;
                 token.start = i ;
                 token.type = ARRAY;
                 j = i;
@@ -215,14 +215,12 @@ void Parser(int size, int startp, char *buff)
                 for(int s = token.start ; s <= token.end; s++){
                     
                     
-                    //implement array size below
                     
-                    
-                    
-                    
-                    
-                    //
                     array[s] = buff[i++];
+                    
+                    if(array[s] == ',' && array[s-1] == '}') token.size++;
+                    if(array[s] == ',' && array[s-1] == '"') token.size++;
+                    if(array[s] == ',' && array[s-1] == ']') token.size++;
                     
                     
                 }
@@ -234,6 +232,8 @@ void Parser(int size, int startp, char *buff)
                 }
                 
                 printf(" (size : %d ,range : %d ~%d , type : %d) \n", token.size , token.start, token.end, token.type);
+                
+                token.size = 0; //
                 
                 i = token.start + 1;
                 
