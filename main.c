@@ -13,7 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void Parser(int size, char * buff);
+void Parser(int start,int end, char * buff);
 
 typedef enum {
     UNDEFINED = 0,
@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
         printf("argv[%d] = %s\n", i, argv[i]);
 
 
-    FILE * fp = fopen("/Users/seojunpyo/Documents/project/19OSS/OSS-GROUP8-PROJECT/OSSproj/OSSproj/test.json", "r");
+    FILE * fp = fopen(argv[1], "r");
     //char buff[1024];
     char d;
     int n = 0;
@@ -82,13 +82,13 @@ int main(int argc, char* argv[]) {
         i++;
     }
 
-    Parser(n,buff);
+    Parser(0,n-1,buff);
     return 0;
 }
 
-void Parser(int size, char *buff)
+void Parser(int start, int end, char *buff)
 {
-    int i = 0;
+    int i = start;
     int j = 0;
     int objNested = 0;
     int objSize = 0;
@@ -102,7 +102,7 @@ void Parser(int size, char *buff)
 //
 //    }
 //
-    i=0;
+   // i=0;
     //
 
     if(buff[0] != '{'){
@@ -113,7 +113,7 @@ void Parser(int size, char *buff)
 
     //  printf("%d", size);
 
-    while(i < size){
+    while(i < end+1){
         // printf("while\n");
 
         switch ( buff[i] ) {
@@ -165,7 +165,7 @@ void Parser(int size, char *buff)
 
                 }
 
-                Parser(objSize, nestObj);
+                Parser(i, i+objSize-1, nestObj);
                 
 
                 break;
