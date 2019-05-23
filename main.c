@@ -1,3 +1,7 @@
+//"/Users/seojunpyo/Documents/project/19OSS/OSS-GROUP8-PROJECT/OSSproj/OSSproj/test.json"
+
+
+
 //
 //  main.c
 //  JsonParser
@@ -8,9 +12,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-void Parser(int start, int end, char * buff);
+void Parser(int size, char * buff);
 
 typedef enum {
     UNDEFINED = 0,
@@ -27,27 +30,28 @@ typedef struct {
     int size; // Number of child (nested) tokens
 } tok_t;
 
-  tok_t token;
+tok_t token;
+
 int main(int argc, char* argv[]) {
-  token.size = 0;
-  int i = 0;
-        // 옵션 지정하지 않았을 때 에러 출력하고 종료
-        if (argc == 1) {
-            fputs("No Input\n", stderr);
-            exit(1);
-        }
 
 
-        // 옵션 개수 출력
-        printf("%d 개의 argv\n\n", argc - 1);
+    // 옵션 지정하지 않았을 때 에러 출력하고 종료
+    if (argc == 1) {
+        fputs("No Input\n", stderr);
+        exit(1);
+    }
 
 
-        // 옵션 배열의 요소들을 하나씩 출력
-        for ( i = 1; i < argc; i++)
-            printf("argv[%d] = %s\n", i, argv[i]);
+    // 옵션 개수 출력
+    printf("%d 개의 argv\n\n", argc - 1);
 
 
-    FILE * fp = fopen(argv[1], "r");
+    // 옵션 배열의 요소들을 하나씩 출력
+    for (int i = 1; i < argc; i++)
+        printf("argv[%d] = %s\n", i, argv[i]);
+
+
+    FILE * fp = fopen("/Users/seojunpyo/Documents/project/19OSS/OSS-GROUP8-PROJECT/OSSproj/OSSproj/test.json", "r");
     //char buff[1024];
     char d;
     int n = 0;
@@ -69,31 +73,35 @@ int main(int argc, char* argv[]) {
     rewind(fp);
 
     char *buff = (char*) malloc(n*sizeof(char));
+    char *nestObj;
+
+    int i=0;
 
     while((d = fgetc(fp)) != EOF){
         buff[i] = d;
         i++;
     }
 
-    Parser(0,n,buff);
+    Parser(n,buff);
     return 0;
 }
 
-void Parser(int start, int end, char *buff)
+void Parser(int size, char *buff)
 {
     int i = 0;
     int j = 0;
-    int cnt = 0;
+    int objNested = 0;
+    int objSize = 0;
 
-    while(i != end){
-        //buff[n] = d;
-        // n++;
-
-        printf("buff[%d] = %c\n", i,buff[i]);
-        i++;
-
-    }
-
+//    while(i != size){
+//        //buff[n] = d;
+//        // n++;
+//
+//        printf("buff[%d] = %c\n", i,buff[i]);
+//        i++;
+//
+//    }
+//
     i=0;
     //
 
@@ -103,159 +111,71 @@ void Parser(int start, int end, char *buff)
     }
     i++;
 
-    while(i < end){
-     switch ( buff[i] ) {
-	    case '{':
-		   token.start = i + 1;
-		   token.type = 1;
+    //  printf("%d", size);
 
+    while(i < size){
+        // printf("while\n");
 
-		   while((buff[j] != '}')){
-	  	    if(buff[j] == ',') token.size += 1;
-            if(buff[j] == '{'){
-      			cnt = j;
-			    while(buff[cnt] != '}') cnt++; // nested object size
-			    Parser(j,cnt,buff);
-            }
-            else{
-                j++;
-            }
-           }
-           token.end = j;
-           Parser(token.start, j, buff); // distinguish element in the Object
-		   break;
-
-	    case '[':
-		   token.start = i + 1;
-		   token.type = 1;
-
-
-		   while((buff[j] != ']')){
-	  	    if(buff[j] == ',') token.size += 1;
-            if(buff[j] == '['){
-      			cnt = j;
-			    while(buff[cnt] != ']') cnt++; // nested object size
-			    Parser(j,cnt,buff);
-            }
-            else{
-                j++;
-            }
-           }
-           token.end = j;
-           Parser(token.start, j, buff); // distinguish element in the Object
-		   break;
-
-        case '"':
-            token.start = i + 1;
-            token.type = 3;
-
-            j = i + 1;
-            cnt = i + 1;
-
-            while((buff[j] != '"')){
-                if(buff[j] == '\\'){
-                  if(buff[j + 1] == '"'){
-                    j += 2;
-                    cnt++;
-                  }
-                }
-                else{
+        switch ( buff[i] ) {
+            case '"':
+                // printf("1");
+                token.start = i+1;
+                token.type = STRING;
+                //printf("2");
+                j=i+1;
+                while(buff[j] != '"'){
                     j++;
-                    cnt++;
                 }
-            }
-		    if(buff[j+1] == ':') token.size = 1;
-		    else if(buff[j+1] == ',') token.size = 0;
+                i = j;
+                // printf("3");
+                token.end = i;
+                token.size = token.end - token.start+1;
 
-            i = j;
 
-            token.end = cnt;
-            for(int a = token.start; a < token.end; a++)
-            {
-                if(buff[a] == '\\'){
-                    a += 1;
-                    switch(buff[a]){
-                        case '"':
-                          printf("%c", buff[a]);
-                          a++;
-                          break;
-                                //                           case '\':
-                                //                               i++;
-                                //                               printf("%c", buff[a]);
-                                //                               break;
-                                //                           case '/':
-                                //                               i++;
-                                //                               printf("%c", buff[a]);
-                                //                               break;
-                                //                           case 'b':
-                                //                               i++;
-                                //                               printf("%c", buff[a]);
-                                //                               break;
-                                //                           case 'f':
-                                //                               i++;
-                                //                               printf("%c", buff[a]);
-                                //                               break;
-                            case 'n':
-                                printf("\n");
-                                a++;
-
-                                break;
-                                //                           case 'r':
-                                //                               i++;
-                                //                               printf("%c", buff[a]);
-                                //                               break;
-                                //                           case 't':
-                                //                               i++;
-                                //                               printf("%c", buff[a]);
-                                //                               break;
-                                //                           case 'u':
-                                //                               i++;
-                                //                               printf("%c", buff[a]);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
+                for(int a = token.start; a<token.end; a++)
+                {
                     printf("%c",buff[a]);
 
                 }
                 printf(" : ");
                 printf("%d\n",token.type);
-                printf("token size = %d\n",token.size);
+               // printf("token size = %d\n",token.size);
                 printf("start = %d, end =%d \n", token.start, token.end);
                 break;
 
-        default:
-            if(buff[i] == 'T') {
-                token.start = i;
-                char * tmp = (char*)malloc(sizeof(char)*5);
-                int cnt = i;
-                for(int temp = 0; cnt < cnt+4; temp++, cnt++)
-                    tmp[temp] = buff[cnt];
-                tmp[4] = '\0'; // null
-                if(!strcmp(tmp, "TRUE")){
-                    token.type = 4;
-                    token.end = cnt;
-                    token.size = 0;
-                    i = cnt;
+            case '{':
+
+
+
+                token.start = i ;
+                token.type = OBJECT;
+                j = i;
+                while(buff[j] != '}'  ){
+                    if(buff[j] == '{') objNested++;
+                    if(buff[j] == '}') objNested--;
+                    if(objNested == 0) break;
+                    j++;
                 }
-            }
-            else if(buff[i] == 'F'){
-                token.start = i;
-                char * tmp = (char*)malloc(sizeof(char)*6);
-                int cnt = i;
-                for(int temp = 0; cnt < cnt+5; temp++, cnt++)
-                    tmp[temp] = buff[cnt];
-                tmp[5] = '\0'; // null
-                if(!strcmp(tmp, "FALSE")){
-                    token.type = 4;
-                    token.end = cnt;
-                    token.size = 0;
-                    i = cnt;
+                token.end = j;
+                objSize = (j - i);
+                char *nestObj = (char*) malloc(objSize*sizeof(char));
+
+                for(int s = 0 ; s < objSize; s++){
+                    nestObj[s] = buff[i++];
+
                 }
-            }
-            break;
-     }
-     i++;
+
+                Parser(objSize, nestObj);
+                
+
+                break;
+
+            default: break;
+
+
+        }
+        i++;
     }
+
+
 }
