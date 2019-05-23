@@ -8,7 +8,7 @@ easily integrated into resource-limited or embedded projects",
 "type": "git",
 "url": "https://github.com/zserge/jsmn.git"
 },
-"frameworks": "*",
+"frameworks": FALSE,
 "platforms": "*",
 "examples": [
 "example/*.c"
