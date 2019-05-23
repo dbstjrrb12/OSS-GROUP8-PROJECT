@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
         printf("argv[%d] = %s\n", i, argv[i]);
     
     
-    FILE * fp = fopen(argv[1], "r");
+    FILE * fp = fopen(argv[1],"r");
     //char buff[1024];
     char d;
     int n = 0;
@@ -94,6 +94,8 @@ void Parser(int size, int startp, char *buff)
     int j = 0;
     int objNested = 0;
     int objSize = 0;
+    int arraySize = 0;
+    int arrayNested = 0;
     
     //    while(i != size){
     //        //buff[n] = d;
@@ -130,8 +132,12 @@ void Parser(int size, int startp, char *buff)
                 }
                 i = j;
                 // printf("3");
+                
                 token.end = i;
-                token.size = token.end - token.start+1;
+                
+                if(buff[i+1] == ':') token.size ++;
+                
+                
                 
                 
                 for(int a = token.start; a<token.end; a++)
@@ -140,7 +146,9 @@ void Parser(int size, int startp, char *buff)
                     
                 }
                 printf(" : ");
-                printf(" (range : %d ~%d , type : %d) \n", token.start, token.end, token.type);
+                printf(" (size : %d , range : %d ~%d , type : %d) \n",token.size , token.start, token.end, token.type);
+                
+                token.size = 0;
                 break;
                 
             case '{':
@@ -152,6 +160,7 @@ void Parser(int size, int startp, char *buff)
                 j = i;
                 while(buff[j] != '}'  ){
                     
+                    if(buff[j] ==':' && buff[j-1] == '"' ) token.size ++;
                     if(buff[j] == '{') objNested++;
                     if(buff[j] == '}') objNested--;
                     if(objNested == 0) break;
@@ -174,11 +183,59 @@ void Parser(int size, int startp, char *buff)
                     
                 }
                 
-                printf(" (range : %d ~%d , type : %d) \n", token.start, token.end, token.type);
+                printf(" (size : %d ,range : %d ~%d , type : %d) \n", token.size , token.start, token.end, token.type);
+                
+                token.size = 0;
                 
                 
                 
                 Parser(token.start + objSize, token.start, nestObj);
+                
+                
+                break;
+                
+            case  '[' :
+                
+                token.start = i ;
+                token.type = ARRAY;
+                j = i;
+                while(buff[j] != ']'  ){
+                    
+                    //if(buff[j] ==':' && buff[j-1] == '"' ) token.size ++;
+                    if(buff[j] == '[') arrayNested++;
+                    if(buff[j] == ']') arrayNested--;
+                    if(arrayNested == 0) break;
+                    j++;
+                }
+                
+                token.end = j;
+                arraySize = (j - i);
+                char *array = (char*) malloc(arraySize*sizeof(char));
+                
+                for(int s = token.start ; s <= token.end; s++){
+                    
+                    
+                    //implement array size below
+                    
+                    
+                    
+                    
+                    
+                    //
+                    array[s] = buff[i++];
+                    
+                    
+                }
+                
+                for(int a = token.start; a<=token.end; a++)
+                {
+                    printf("%c",buff[a]);
+                    
+                }
+                
+                printf(" (size : %d ,range : %d ~%d , type : %d) \n", token.size , token.start, token.end, token.type);
+                
+                i = token.start + 1;
                 
                 
                 break;
