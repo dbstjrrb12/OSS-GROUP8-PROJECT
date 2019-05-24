@@ -1,18 +1,5 @@
-//"/Users/seojunpyo/Documents/project/19OSS/OSS-GROUP8-PROJECT/OSSproj/OSSproj/test.json"
-
-
-
-//
-//  main.c
-//  JsonParser
-//
-//  Created by 지은신 on 17/05/2019.
-//  Copyright © 2019 지은신. All rights reserved.
-//
-
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 void Parser(int size, int start, char * buff);
 
@@ -54,7 +41,7 @@ int main(int argc, char* argv[]) {
         printf("argv[%d] = %s\n", i, argv[i]);
     
     
-    FILE * fp = fopen("test.json", "r");
+    FILE * fp = fopen(argv[1], "r");
     //char buff[1024];
     char d;
     int n = 0;
@@ -93,21 +80,13 @@ void Parser(int size, int startp, char *buff)
 {
     int i = 0;
     int j = 0;
+    int cnt = 0;
     int objNested = 0;
     int objSize = 0;
     int arraySize = 0;
     int arrayNested = 0;
     
-    //    while(i != size){
-    //        //buff[n] = d;
-    //        // n++;
-    //
-    //        printf("buff[%d] = %c\n", i,buff[i]);
-    //        i++;
-    //
-    //    }
-    //
-    i=startp;
+    i = startp;
     //
     
     if(buff[i] != '{'){
@@ -127,9 +106,21 @@ void Parser(int size, int startp, char *buff)
                 token.start = i+1;
                 token.type = STRING;
                 //printf("2");
-                j=i+1;
+                j = i + 1;
+                cnt = i + 1;
+                
                 while(buff[j] != '"'){
-                    j++;
+                    if(buff[j] == '\\'){
+                        if(buff[j + 1] == '"'){
+                            j += 2;
+                            cnt++;
+                        }
+                        else if(buff[j + 1] == 'n'){
+                            j += 2;
+                            cnt++;
+                        }
+                    }
+                    else { j++; cnt++;}
                 }
                 i = j;
                 // printf("3");
@@ -139,12 +130,28 @@ void Parser(int size, int startp, char *buff)
                 if(buff[i+1] == ':') token.size ++;
                 
                 
-                
-                
-                for(int a = token.start; a<token.end; a++)
+                for(int a = token.start; a < token.end; a++)
                 {
+                    if(buff[a] == '\\'){
+                        a++;
+                        
+                        switch(buff[a]){
+                            case '"':
+                                printf("%c", buff[a]);
+                                a++;
+                                break;
+                                
+                            case 'n':
+                                printf("\n");
+                                a++;
+                                break;
+                                
+                            default:
+                                break;
+                        }
+                        i++;
+                    }
                     printf("%c",buff[a]);
-                    
                 }
                 printf(" : ");
                 printf(" (size : %d , range : %d ~%d , type : %d) \n",token.size , token.start, token.end, token.type);
@@ -153,8 +160,6 @@ void Parser(int size, int startp, char *buff)
                 break;
                 
             case '{':
-                
-                
                 
                 token.start = i ;
                 token.type = OBJECT;
@@ -215,8 +220,6 @@ void Parser(int size, int startp, char *buff)
                 
                 for(int s = token.start ; s <= token.end; s++){
                     
-                    
-                    
                     array[s] = buff[i++];
                     
                     if(array[s] == ',' && array[s-1] == '}') token.size++;
@@ -226,7 +229,7 @@ void Parser(int size, int startp, char *buff)
                     
                 }
                 
-                for(int a = token.start; a<=token.end; a++)
+                for(int a = token.start; a <= token.end; a++)
                 {
                     printf("%c",buff[a]);
                     
@@ -262,7 +265,7 @@ void Parser(int size, int startp, char *buff)
                         token.size = 0;
                         i = cnt;
                     }
-                    for(int a = token.start; a<=token.end; a++)
+                    for(int a = token.start; a<token.end; a++)
                     {
                         printf("%c",buff[a]);
                         
@@ -290,7 +293,7 @@ void Parser(int size, int startp, char *buff)
                         token.size = 0;
                         i = cnt;
                     }
-                    for(int a = token.start; a<=token.end; a++)
+                    for(int a = token.start; a<token.end; a++)
                     {
                         printf("%c",buff[a]);
                         
