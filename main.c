@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 void Parser(int size, int start, char * buff);
 
@@ -53,7 +54,7 @@ int main(int argc, char* argv[]) {
         printf("argv[%d] = %s\n", i, argv[i]);
     
     
-    FILE * fp = fopen("/Users/seojunpyo/Documents/project/19OSS/OSS-GROUP8-PROJECT/OSSproj/OSSproj/test.json", "r");
+    FILE * fp = fopen("test.json", "r");
     //char buff[1024];
     char d;
     int n = 0;
@@ -240,7 +241,63 @@ void Parser(int size, int startp, char *buff)
                 
                 break;
                 
-            default: break;
+            default:
+                if(buff[i] == 'T') {
+                    token.start = i;
+                    char * tmp = (char*)malloc(sizeof(char)*5);
+                    int cnt = i;
+                    int temp;
+                    for(temp = 0; cnt < i+4; temp++)
+                    {
+                        tmp[temp] = buff[cnt];
+                        cnt++;
+                        //printf("%c",tmp[temp]);
+                        
+                    }
+                    
+                    tmp[4] = '\0'; // null
+                    if(!strcmp(tmp, "TRUE")){
+                        token.type = 4;
+                        token.end = cnt;
+                        token.size = 0;
+                        i = cnt;
+                    }
+                    for(int a = token.start; a<=token.end; a++)
+                    {
+                        printf("%c",buff[a]);
+                        
+                    }
+                    
+                    printf(" (size : %d ,range : %d ~%d , type : %d) \n", token.size , token.start, token.end, token.type);
+                }
+                else if(buff[i] == 'F'){
+                    token.start = i;
+                    char * tmp = (char*)malloc(sizeof(char)*6);
+                    int cnt = i;
+                    int temp;
+                    for(temp = 0; cnt < i+5; temp++)
+                    {
+                        tmp[temp] = buff[cnt];
+                        cnt++;
+                        //printf("%c",tmp[temp]);
+                    }
+                    
+                    
+                    tmp[5] = '\0'; // null
+                    if(!strcmp(tmp, "FALSE")){
+                        token.type = 4;
+                        token.end = cnt;
+                        token.size = 0;
+                        i = cnt;
+                    }
+                    for(int a = token.start; a<=token.end; a++)
+                    {
+                        printf("%c",buff[a]);
+                        
+                    }
+                    
+                    printf(" (size : %d ,range : %d ~%d , type : %d) \n", token.size , token.start, token.end, token.type);
+                }
                 
                 
         }
