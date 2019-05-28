@@ -1,19 +1,9 @@
-//"/Users/seojunpyo/Documents/project/19OSS/OSS-GROUP8-PROJECT/OSSproj/OSSproj/test.json"
-
-
-
-//
-//  main.c
-//  JsonParser
-//
-//  Created by 지은신 on 17/05/2019.
-//  Copyright © 2019 지은신. All rights reserved.
-//
-
 #include <stdio.h>
 #include <stdlib.h>
 
-void Parser(int size, char * buff);
+void Parser(int size, int start, char * buff);
+
+int start = 0;
 
 typedef enum {
     UNDEFINED = 0,
@@ -51,7 +41,7 @@ int main(int argc, char* argv[]) {
         printf("argv[%d] = %s\n", i, argv[i]);
 
 
-    FILE * fp = fopen("/Users/seojunpyo/Documents/project/19OSS/OSS-GROUP8-PROJECT/OSSproj/OSSproj/test.json", "r");
+    FILE * fp = fopen(argv[1], "r");
     //char buff[1024];
     char d;
     int n = 0;
@@ -73,7 +63,7 @@ int main(int argc, char* argv[]) {
     rewind(fp);
 
     char *buff = (char*) malloc(n*sizeof(char));
-    char *nestObj;
+
 
     int i=0;
 
@@ -82,30 +72,24 @@ int main(int argc, char* argv[]) {
         i++;
     }
 
-    Parser(n,buff);
+    Parser(n,start , buff);
     return 0;
 }
 
-void Parser(int size, char *buff)
+void Parser(int size, int startp, char *buff)
 {
     int i = 0;
     int j = 0;
+    int cnt = 0;
     int objNested = 0;
     int objSize = 0;
+    int arraySize = 0;
+    int arrayNested = 0;
 
-//    while(i != size){
-//        //buff[n] = d;
-//        // n++;
-//
-//        printf("buff[%d] = %c\n", i,buff[i]);
-//        i++;
-//
-//    }
-//
-    i=0;
+    i = startp;
     //
 
-    if(buff[0] != '{'){
+    if(buff[i] != '{'){
         printf("in if \n");
         return;
     }
@@ -122,35 +106,122 @@ void Parser(int size, char *buff)
                 token.start = i+1;
                 token.type = STRING;
                 //printf("2");
-                j=i+1;
+                j = i + 1;
+                cnt = i + 1;
+
                 while(buff[j] != '"'){
-                    j++;
+                  if(buff[j] == '\\'){
+
+                    if(buff[j + 1] == '"'){
+                        j += 2;
+                        cnt++;
+                    }
+                    else if(buff[j + 1] == '\\'){
+                        j += 2;
+                        cnt++;
+                    }
+                    else if(buff[j + 1] == '/'){
+                        j += 2;
+                        cnt++;
+                    }
+                    else if(buff[j + 1] == 'b'){
+                        j += 2;
+                        cnt++;
+                    }
+                    else if(buff[j + 1] == 'f'){
+                        j += 2;
+                        cnt++;
+                    }
+                    else if(buff[j + 1] == 'n'){
+                        j += 2;
+                        cnt++;
+                    }
+                    else if(buff[j + 1] == 'r'){
+                        j += 2;
+                        cnt++;
+                    }
+                    else if(buff[j + 1] == 't'){
+                        j += 2;
+                        cnt++;
+                    }
+                    else if(buff[j + 1] == 'u'){
+                        j += 1;
+                        cnt++;
+                    }
+
+                  }
+                  else { j++; cnt++;}
                 }
                 i = j;
                 // printf("3");
+
                 token.end = i;
-                token.size = token.end - token.start+1;
+
+                if(buff[i+1] == ':') token.size ++;
 
 
-                for(int a = token.start; a<token.end; a++)
+                for(int a = token.start; a < token.end; a++)
                 {
-                    printf("%c",buff[a]);
+                  if(buff[a] == '\\'){
+                        a++;
 
+                        switch(buff[a]){
+                            case '"':
+                                printf("%c", buff[a]);
+                                a++;
+                                break;
+                            case '\\':
+                                printf("%c", buff[a]);
+                                a++;
+                                break;
+                            case '/':
+                                printf("%c", buff[a]);
+                                a++;
+                                break;
+                            case 'b':
+                                printf("\b");
+                                a++;
+                                break;
+                            case 'f':
+                                printf("\f");
+                                a++;
+                                break;
+                            case 'n':
+                                printf("\n");
+                                a++;
+                                break;
+                            case 'r':
+                                printf("\r");
+                                a++;
+                                break;
+                            case 't':
+                                printf("\t");
+                                a++;
+                                break;
+                            case 'u':
+                                break;
+
+                            default:
+                                break;
+                        }
+                        i++;
+                    }
+                    printf("%c",buff[a]);
                 }
                 printf(" : ");
-                printf("%d\n",token.type);
-               // printf("token size = %d\n",token.size);
-                printf("start = %d, end =%d \n", token.start, token.end);
+                printf(" (size : %d , range : %d ~%d , type : %d) \n",token.size , token.start, token.end, token.type);
+
+                token.size = 0;
                 break;
 
             case '{':
-
-
 
                 token.start = i ;
                 token.type = OBJECT;
                 j = i;
                 while(buff[j] != '}'  ){
+
+                    if(buff[j] ==':' && buff[j-1] == '"' ) token.size ++;
                     if(buff[j] == '{') objNested++;
                     if(buff[j] == '}') objNested--;
                     if(objNested == 0) break;
@@ -160,13 +231,71 @@ void Parser(int size, char *buff)
                 objSize = (j - i);
                 char *nestObj = (char*) malloc(objSize*sizeof(char));
 
-                for(int s = 0 ; s < objSize; s++){
+                for(int s = token.start ; s <= token.end; s++){
+
                     nestObj[s] = buff[i++];
+
 
                 }
 
-                Parser(objSize, nestObj);
-                
+                for(int a = token.start; a<=token.end; a++)
+                {
+                    printf("%c",buff[a]);
+
+                }
+
+                printf(" (size : %d ,range : %d ~%d , type : %d) \n", token.size , token.start, token.end, token.type);
+
+                token.size = 0;
+
+
+
+                Parser(token.start + objSize, token.start, nestObj);
+
+
+                break;
+
+            case  '[' :
+                token.size ++;
+                token.start = i ;
+                token.type = ARRAY;
+                j = i;
+                while(buff[j] != ']'  ){
+
+                    //if(buff[j] ==':' && buff[j-1] == '"' ) token.size ++;
+                    if(buff[j] == '[') arrayNested++;
+                    if(buff[j] == ']') arrayNested--;
+                    if(arrayNested == 0) break;
+                    j++;
+                }
+
+                token.end = j;
+                arraySize = (j - i);
+                char *array = (char*) malloc(arraySize*sizeof(char));
+
+                for(int s = token.start ; s <= token.end; s++){
+
+                    array[s] = buff[i++];
+
+                    if(array[s] == ',' && array[s-1] == '}') token.size++;
+                    if(array[s] == ',' && array[s-1] == '"') token.size++;
+                    if(array[s] == ',' && array[s-1] == ']') token.size++;
+
+
+                }
+
+                for(int a = token.start; a <= token.end; a++)
+                {
+                    printf("%c",buff[a]);
+
+                }
+
+                printf(" (size : %d ,range : %d ~%d , type : %d) \n", token.size , token.start, token.end, token.type);
+
+                token.size = 0; //
+
+                i = token.start + 1;
+
 
                 break;
 

@@ -1,7 +1,7 @@
 {
-"name": "js\nmn",
-"keywords": "js\"on",
-"description": "Minimalistic JSON parser/tokenizer in C. It can be
+"name": "jsmn",
+"keywords": "js\ton",
+"d\bescription": "Minimalistic JSON parser/tokenizer in C. It can be
 easily integrated into resource-limited or embedded projects",
 "repository":
 {
