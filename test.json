@@ -1,23 +1,18 @@
 {
-<<<<<<< HEAD
-"name": "jsmn",
-"keywords": "js\ton",
-"d\bescription": "Minimalistic JSON parser/tokenizer in C. It can be
-=======
-"name": "j\nsmn",
-"keywords": "json",
-"description": "Minimalistic JSON parser/tokenizer in C. It can be
->>>>>>> 7c811088c6ac2f460bd4959d25dfc576ab4ab80f
-easily integrated into resource-limited or embedded projects",
-"repository":
-{
-"type": "git",
-"url": "https://github.com/zserge/jsmn.git"
-},
-"frameworks": FALSE,
-"platforms": "*",
-"examples": [
-"example/*.c"
-],
-"exclude": "test"
+ "name": "jsmn",
+ "keywords": "json",
+ "description": "Minimalistic JSON parser/tokenizer in C. It can be
+ easily integrated into resource-limited or embedded projects",
+ "repository":
+ {
+  "type": "git",
+  "url": "https://github.com/zserge/jsmn.git"
+ },
+ "frameworks": "*",
+ "platforms": "*",
+ "examples": [
+ "example/*.c"
+ ],
+ "exclude": "test",
+ "exclude": FALSE
 }
