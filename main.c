@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void Parser(int size, int start, char * buff);
+#define TOKEN_COUNT 1024
 
 int start = 0;
 
@@ -19,12 +19,32 @@ typedef struct {
     int start; // Token start position
     int end; // Token end position
     int size; // Number of child (nested) tokens
+    char *string;
 } tok_t;
 
 tok_t token;
 
-int main(int argc, char* argv[]) {
+// JSON 구조체
+typedef struct JSON {
+    tok_t tokenSAVE[TOKEN_COUNT]; // 토큰 배열
+}JSON;
 
+void Parser(int size, int start, char * buff, JSON *json);
+
+int tokenIndex = 0;
+
+void freeJSON (JSON *json)
+{
+    for (int i = 0; i < TOKEN_COUNT; i++)            // 토큰 개수만큼 반복
+    {
+        if (json->tokenSAVE[i].type == STRING)    // 토큰 종류가 문자열이면
+            free(json->tokenSAVE[i].string);
+
+    }// 동적 메모리 해제
+}
+
+int main(int argc, char* argv[]) {
+    JSON json = { 0, };
 
     // 옵션 지정하지 않았을 때 에러 출력하고 종료
     if (argc == 1) {
@@ -63,21 +83,24 @@ int main(int argc, char* argv[]) {
 
     rewind(fp);
 
-    char *buff = (char*) malloc(n*sizeof(char));
+    char *buff = (char*) malloc(n * sizeof(char));
 
 
-    int i=0;
+    int i = 0;
 
     while((d = fgetc(fp)) != EOF){
         buff[i] = d;
         i++;
     }
 
-    Parser(n,start , buff);
+    Parser(n,start , buff, &json);
+    printf("%s\n",json.tokenSAVE[0].string);
+
+    freeJSON(&json);
     return 0;
 }
 
-void Parser(int size, int startp, char *buff)
+void Parser(int size, int startp, char *buff, JSON *json)
 {
     int i = 0;
     int j = 0;
@@ -209,6 +232,18 @@ void Parser(int size, int startp, char *buff)
                     }
                     printf("%c",buff[a]);
                 }
+                json->tokenSAVE[tokenIndex].type = STRING;
+                // 문자열 길이 + NULL 공간만큼 메모리 할당
+                json->tokenSAVE[tokenIndex].string = malloc((token.end-token.start+1) + 1);
+                // 할당한 메모리를 0으로 초기화
+                memset(json->tokenSAVE[tokenIndex].string, 0, (token.end-token.start+1) + 1);
+
+                // 문서에서 문자열을 토큰에 저장
+                // 문자열 시작 위치에서 문자열 길이만큼만 복사
+                memcpy(json->tokenSAVE[tokenIndex].string, token.start, (token.end-token.start+1));
+
+                tokenIndex++; // 토큰 인덱스 증가
+
                 printf(" : ");
                 printf(" (size : %d , range : %d ~%d , type : %d) \n",token.size , token.start, token.end, token.type);
 
@@ -251,7 +286,7 @@ void Parser(int size, int startp, char *buff)
 
 
 
-                Parser(token.start + objSize, token.start, nestObj);
+                Parser(token.start + objSize, token.start, nestObj, &json);
 
 
                 break;
@@ -359,7 +394,6 @@ void Parser(int size, int startp, char *buff)
                }
 
             break;
-
 
         }
         i++;
