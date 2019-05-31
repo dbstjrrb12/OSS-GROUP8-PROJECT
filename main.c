@@ -94,7 +94,6 @@ int main(int argc, char* argv[]) {
     }
 
     Parser(n,start , buff, &json);
-    printf("%s\n",json.tokenSAVE[0].string);
 
     freeJSON(&json);
     return 0;
@@ -128,6 +127,7 @@ void Parser(int size, int startp, char *buff, JSON *json)
             case '"':
                 // printf("1");
                 token.start = i+1;
+
                 token.type = STRING;
                 //printf("2");
                 j = i + 1;
@@ -230,22 +230,21 @@ void Parser(int size, int startp, char *buff, JSON *json)
                         }
                         i++;
                     }
-                    printf("%c",buff[a]);
+                    // printf("%c",buff[a]);
                 }
+
                 json->tokenSAVE[tokenIndex].type = STRING;
+                char *start = &buff[token.start];
                 // 문자열 길이 + NULL 공간만큼 메모리 할당
-                json->tokenSAVE[tokenIndex].string = malloc((token.end-token.start+1) + 1);
+                json->tokenSAVE[tokenIndex].string = malloc((token.end-token.start + 1) + 1);
                 // 할당한 메모리를 0으로 초기화
-                memset(json->tokenSAVE[tokenIndex].string, 0, (token.end-token.start+1) + 1);
+                memset(json->tokenSAVE[tokenIndex].string, 0, (token.end - token.start + 1) + 1);
 
-                // 문서에서 문자열을 토큰에 저장
-                // 문자열 시작 위치에서 문자열 길이만큼만 복사
-                memcpy(json->tokenSAVE[tokenIndex].string, token.start, (token.end-token.start+1));
-
+                memcpy(json->tokenSAVE[tokenIndex].string, start, (token.end - token.start ));
+                  printf("%s\n",json->tokenSAVE[tokenIndex].string);
                 tokenIndex++; // 토큰 인덱스 증가
-
-                printf(" : ");
-                printf(" (size : %d , range : %d ~%d , type : %d) \n",token.size , token.start, token.end, token.type);
+                // printf(" : ");
+                // printf(" (size : %d , range : %d ~%d , type : %d) \n",token.size , token.start, token.end, token.type);
 
                 token.size = 0;
                 break;
@@ -274,19 +273,19 @@ void Parser(int size, int startp, char *buff, JSON *json)
 
                 }
 
-                for(int a = token.start; a<=token.end; a++)
-                {
-                    printf("%c",buff[a]);
+                // for(int a = token.start; a<=token.end; a++)
+                // {
+                //     // printf("%c",buff[a]);
+                //
+                // }
 
-                }
-
-                printf(" (size : %d ,range : %d ~%d , type : %d) \n", token.size , token.start, token.end, token.type);
+                // printf(" (size : %d ,range : %d ~%d , type : %d) \n", token.size , token.start, token.end, token.type);
 
                 token.size = 0;
 
 
 
-                Parser(token.start + objSize, token.start, nestObj, &json);
+                Parser(token.start + objSize, token.start, nestObj, json);
 
 
                 break;
@@ -319,14 +318,14 @@ void Parser(int size, int startp, char *buff, JSON *json)
 
 
                 }
-
-                for(int a = token.start; a <= token.end; a++)
-                {
-                    printf("%c",buff[a]);
-
-                }
-
-                printf(" (size : %d ,range : %d ~%d , type : %d) \n", token.size , token.start, token.end, token.type);
+                //
+                // for(int a = token.start; a <= token.end; a++)
+                // {
+                //     printf("%c",buff[a]);
+                //
+                // }
+                //
+                // printf(" (size : %d ,range : %d ~%d , type : %d) \n", token.size , token.start, token.end, token.type);
 
                 token.size = 0; //
 
@@ -356,13 +355,13 @@ void Parser(int size, int startp, char *buff, JSON *json)
                        token.size = 0;
                        i = cnt;
                    }
-                   for(int a = token.start; a<token.end; a++)
-                   {
-                       printf("%c",buff[a]);
-
-                   }
-
-                   printf(" (size : %d ,range : %d ~%d , type : %d) \n", token.size , token.start, token.end, token.type);
+                   // for(int a = token.start; a<token.end; a++)
+                   // {
+                   //     printf("%c",buff[a]);
+                   //
+                   // }
+                   //
+                   // printf(" (size : %d ,range : %d ~%d , type : %d) \n", token.size , token.start, token.end, token.type);
                }
                else if(buff[i] == 'F'){
                    token.start = i;
@@ -375,8 +374,6 @@ void Parser(int size, int startp, char *buff, JSON *json)
                        cnt++;
                        //printf("%c",tmp[temp]);
                    }
-
-
                    tmp[5] = '\0'; // null
                    if(!strcmp(tmp, "FALSE")){
                        token.type = 4;
@@ -384,13 +381,14 @@ void Parser(int size, int startp, char *buff, JSON *json)
                        token.size = 0;
                        i = cnt;
                    }
-                   for(int a = token.start; a<token.end; a++)
-                   {
-                       printf("%c",buff[a]);
 
-                   }
-
-                   printf(" (size : %d ,range : %d ~%d , type : %d) \n", token.size , token.start, token.end, token.type);
+                   // for(int a = token.start; a<token.end; a++)
+                   // {
+                   //     printf("%c",buff[a]);
+                   //
+                   // }
+                   //
+                   // printf(" (size : %d ,range : %d ~%d , type : %d) \n", token.size , token.start, token.end, token.type);
                }
 
             break;
